@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="pt-PT" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gestor de Despesas Pessoais</title>
+
+  <!-- Bootstrap 5.3 + Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <!-- Tipografia -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
+  <!-- Estilos próprios -->
+  <link href="./css/style.css" rel="stylesheet" defer>
+  <!-- js -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="./js/apis.js" defer></script>
+  <script src="./js/script.js" defer></script>
+  <link rel="icon" href="/image/wallet2.svg" sizes="any">
+</head>
+<body>
+
+  <!-- =====================================================
+       1. LOGIN (simulado)
+       JS: mostrar/esconder #secaoLogin e #secaoApp
+       ===================================================== -->
+  <section id="secaoLogin" class="login-wrap">
+    <div class="card login-card shadow-sm">
+      <div class="card-body p-4 p-md-5">
+        <div class="brand mb-4">
+          <i class="bi bi-wallet2"></i>
+          <span data-i18n="app.nome">Gestor de Despesas</span>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <h1 class="h4 mb-0" data-i18n="login.entrar">Entrar</h1>
+          <div class="d-flex align-items-center gap-2">
+            <!-- Tema e idioma no login: reencaminham o clique para os botões da navbar (#btnTema / #btnIdioma) -->
+            <button id="btnTemaLogin" type="button" class="btn btn-outline-secondary btn-sm" aria-label="Alternar tema claro/escuro">
+              <i id="iconeTemaLogin" class="bi bi-moon-stars"></i>
+            </button>
+            <button id="btnIdiomaLogin" type="button" class="btn btn-outline-secondary btn-sm" aria-label="Mudar idioma / Change language">
+              <i class="bi bi-translate"></i> <span id="idiomaDestinoLogin">EN</span>
+            </button>
+          </div>
+        </div>
+        <p class="text-body-secondary mb-4" data-i18n="login.sub">Introduza os seus dados para começar a registar despesas.</p>
+        <p class="text-body-secondary mb-4" data-i18n="loginTest.sub">(Login Teste pronto a entar. Código com placeholder disponivel no html!)</p>
+
+        <form id="formLogin" novalidate>
+          <div class="mb-3">
+            <label for="loginNome" class="form-label" data-i18n="login.nome">Nome</label>
+            <!-- User já preenchido, pronto a entrar! placeholder abaixo se necessário trocar -->
+              <input type="text" class="form-control" id="loginNome" value="Teste" data-i18n-placeholder="login.nomePh" required>
+              <!-- User por preencher, mas com placeholder -->
+              <!-- <input type="text" class="form-control" id="loginNome" placeholder="O seu nome" data-i18n-placeholder="login.nomePh" required> -->
+            <div class="invalid-feedback" data-i18n="login.erroNome">Indique o seu nome.</div>
+          </div>
+          <div class="mb-4">
+            <label for="loginPassword" class="form-label" data-i18n="login.pass">Palavra-passe</label>
+            <!-- Password já preenchido, pronto a entrar!  placeholder abaixo se necessário trocar -->
+            <input type="password" class="form-control" id="loginPassword" value="teste" required>
+              <!-- Password por preencher, mas com placeholder -->
+            <!-- <input type="password" class="form-control" id="loginPassword" placeholder="••••••" required> -->
+            <div class="invalid-feedback" data-i18n="login.erroPass">Indique a palavra-passe.</div>
+          </div>
+          <button type="submit" class="btn btn-primary w-100" data-i18n="login.entrar">Entrar</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================================================
+       2. APLICAÇÃO (visível depois do login)
+       ===================================================== -->
+  <div id="secaoApp" class="d-none">
+
+    <!-- Barra de topo -->
+    <nav class="navbar topbar sticky-top">
+      <div class="container-xl">
+        <div class="d-flex align-items-center gap-3">
+          <span class="brand">
+            <i class="bi bi-wallet2"></i>
+            <span class="d-none d-sm-inline" data-i18n="app.nome">Gestor de Despesas</span>
+          </span>
+          <span id="saudacao" class="saudacao">Olá, Utilizador</span>
+        </div>
+
+        <div class="d-flex align-items-center gap-2 gap-md-3">
+          <!-- Data e hora atuais -->
+          <div class="relogio text-end d-none d-md-block">
+            <div id="horaAtual" class="relogio-hora">00:00:00</div>
+            <div id="dataAtual" class="relogio-data">—</div>
+          </div>
+
+        <!-- Bitcoin: abre o pop-up #modalBitcoin -->
+          <button id="btnBitcoin" type="button" class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modalBitcoin" aria-label="Bitcoin">
+            <i class="bi bi-currency-bitcoin"></i>
+          </button>
+
+          <!-- Opções: horário e cidade do tempo (abre #modalOpcoes) -->
+          <button id="btnOpcoes" type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#modalOpcoes" aria-label="Opções">
+            <i class="bi bi-gear"></i>
+          </button>
+
+          <!-- Tema claro/escuro -->
+          <button id="btnTema" type="button" class="btn btn-outline-secondary btn-sm" aria-label="Alternar tema claro/escuro">
+            <i id="iconeTema" class="bi bi-moon-stars"></i>
+          </button>
+
+          <!-- Idioma: mostra o idioma para onde vai mudar (PT/EN) -->
+          <button id="btnIdioma" type="button" class="btn btn-outline-secondary btn-sm" aria-label="Mudar idioma / Change language">
+            <i class="bi bi-translate"></i> <span id="idiomaDestino">EN</span>
+          </button>
+
+          <!-- Terminar sessão -->
+          <button id="btnLogout" type="button" class="btn btn-outline-danger btn-sm">
+            <i class="bi bi-box-arrow-right"></i>
+            <span class="d-none d-sm-inline" data-i18n="nav.sair">Sair</span>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container-xl py-4 app-main">
+
+      <!-- Data/hora em ecrãs pequenos -->
+      <div class="relogio d-md-none mb-3">
+        <span id="horaAtualMobile" class="relogio-hora">00:00:00</span>
+        <span id="dataAtualMobile" class="relogio-data ms-2">—</span>
+      </div>
+
+      <div class="row g-4 app-row">
+
+        <!-- ================= Coluna esquerda ================= -->
+        <aside class="col-lg-4 app-col-esq">
+
+          <!-- Formulário de nova despesa -->
+    <div class="card mb-4">
+            <div class="card-body p-4">
+              <h2 class="h5 mb-3" data-i18n="form.titulo">Nova despesa</h2>
+ 
+              <form id="formDespesa" novalidate>
+                <div class="mb-3">
+                  <label for="descricao" class="form-label" data-i18n="campo.descricao">Descrição</label>
+                  <input type="text" class="form-control" id="descricao" placeholder="Ex.: Almoço no trabalho" data-i18n-placeholder="form.descPh" required>
+                  <div class="invalid-feedback" data-i18n="erro.descricao">Indique uma descrição.</div>
+                </div>
+ 
+                <div class="row g-3 mb-3">
+                  <div class="col-6">
+                    <label for="valor" class="form-label" data-i18n="campo.valor">Valor</label>
+                    <div class="input-group">
+                      <input type="number" class="form-control" id="valor" min="0.01" step="0.01" placeholder="0,00" required>
+                      <span class="input-group-text">€</span>
+                      <div class="invalid-feedback" data-i18n="erro.valor">Valor inválido.</div>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <label for="categoria" class="form-label" data-i18n="campo.categoria">Categoria</label>
+                    <select class="form-select" id="categoria" required>
+                      <option value="" selected disabled data-i18n="campo.escolher">Escolher</option>
+                      <option value="Alimentação">Alimentação</option>
+                      <option value="Transportes">Transportes</option>
+                      <option value="Habitação">Habitação</option>
+                      <option value="Lazer">Lazer</option>
+                      <option value="Finanças">Finanças</option>
+                      <option value="Saúde">Saúde</option>
+                      <option value="Educação">Educação</option>
+                      <option value="Outros">Outros</option>
+                    </select>
+                    <div class="invalid-feedback" data-i18n="erro.categoria">Escolha uma categoria.</div>
+                  </div>
+                </div>
+ 
+                <div class="mb-3">
+                  <label for="dataDespesa" class="form-label" data-i18n="campo.data">Data</label>
+                  <input type="date" class="form-control" id="dataDespesa" required>
+                  <div class="invalid-feedback" data-i18n="erro.data">Indique uma data.</div>
+                </div>
+ 
+                <button type="submit" class="btn btn-primary w-100">
+                  <i class="bi bi-plus-lg"></i> <span data-i18n="form.adicionar">Adicionar despesa</span>
+                </button>
+              </form>
+            </div>
+          </div>
+  
+
+          <!-- Cartão da API (ex.: Open-Meteo, sem chave) -->
+          <div class="card" id="cardTempo">
+            <div class="card-body p-4">
+              <h2 class="h5 mb-3" data-i18n="tempo.titulo">Tempo</h2>
+
+              <div id="tempoCarregando" class="text-body-secondary small" data-i18n="tempo.carregando">A carregar dados...</div>
+              <div id="tempoErro" class="alert alert-warning small mb-0 d-none" data-i18n="tempo.erro">Não foi possível obter o tempo.</div>
+
+              <div id="tempoConteudo" class="d-none">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div>
+                    <div id="tempoLocal" class="fw-semibold">Lisboa</div>
+                    <div id="tempoDescricao" class="text-body-secondary small">—</div>
+                  </div>
+                  <div class="tempo-temp"><span id="tempoTemp">--</span>°C</div>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between small text-body-secondary">
+                  <span><i class="bi bi-wind"></i> <span data-i18n="tempo.vento">Vento</span>: <span id="tempoVento">--</span> km/h</span>
+                  <span><i class="bi bi-droplet"></i> <span data-i18n="tempo.humidade">Humidade</span>: <span id="tempoHumidade">--</span>%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- ================= Coluna direita ================= -->
+        <section class="col-lg-8 app-col-dir">
+
+          <!-- Total + filtro -->
+          <div class="card mb-4">
+            <div class="card-body p-4">
+              <div class="row g-3 align-items-end">
+                <div class="col-sm-7">
+                  <div class="total-label" data-i18n="total.titulo">Total gasto</div>
+                  <div class="total-valor"><span id="totalGasto">0,00</span> €</div>
+                  <div class="text-body-secondary small">
+                    <span id="totalContagem">0</span> <span data-i18n="total.despesas">despesa(s)</span> <span id="totalFiltroInfo"></span>
+                  </div>
+                </div>
+                <div class="col-sm-5">
+                  <label for="filtroCategoria" class="form-label" data-i18n="filtro.label">Filtrar por categoria</label>
+                  <select class="form-select" id="filtroCategoria">
+                    <option value="todas" selected data-i18n="filtro.todas">Todas</option>
+                    <option value="Alimentação">Alimentação</option>
+                    <option value="Transportes">Transportes</option>
+                    <option value="Habitação">Habitação</option>
+                    <option value="Lazer">Lazer</option>
+                    <option value="Finanças">Finanças</option>
+                    <option value="Saúde">Saúde</option>
+                    <option value="Educação">Educação</option>
+                    <option value="Outros">Outros</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lista de despesas -->
+          <div class="card app-lista">
+            <div class="card-body p-0">
+              <div class="d-flex justify-content-between align-items-center px-4 pt-4 pb-3">
+                <h2 class="h5 mb-0" data-i18n="lista.titulo">Despesas</h2>
+                <!-- Apaga as despesas da categoria ativa (ou todas); o texto muda pelo JS -->
+                <button type="button" id="btnApagarTodas" class="btn btn-outline-danger btn-sm">
+                  <i class="bi bi-trash"></i> <span id="textoApagarTodas">Apagar todas</span>
+                </button>
+              </div>
+
+              <!-- Estado vazio -->
+              <div id="semDespesas" class="vazio text-center px-4 pb-5">
+                <i class="bi bi-receipt"></i>
+                <p class="mb-0" data-i18n="lista.vazio">Ainda não há despesas. Adicione a primeira no formulário ou nas definições em modo aleatório.</p>
+              </div>
+
+              <!-- Tabela -->
+              <div class="table-responsive app-lista-scroll">
+                <table class="table align-middle mb-0 d-none" id="tabelaDespesas">
+                  <thead>
+                    <tr>
+                      <th class="ps-4" data-i18n="campo.descricao">Descrição</th>
+                      <th data-i18n="campo.categoria">Categoria</th>
+                      <th class="text-end" data-i18n="campo.valor">Valor</th>
+                      <th class="text-end pe-4" data-i18n="lista.acoes">Ações</th>
+                    </tr>
+                  </thead>
+                  <!-- O JS preenche as linhas aqui -->
+                  <tbody id="listaDespesas"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+  <footer class="container-xl pb-4 text-body-secondary small text-center">
+    <!-- <span data-i18n="rodape">Leonel Silva · CESAE · WEBS · JS Projeto Final · Gestor de Despesas Pessoais</span> · -->
+      <span data-i18n="rodape"></span><br>
+    <a href="https://time.now" target="_blank" rel="noopener" class="text-body-secondary"> World Time API by Time.Now</a> · 
+    <a href="https://open-meteo.com/" target="_blank" rel="noopener" class="text-body-secondary"> World Weather API by Open-Meteo</a> · 
+    <a href="https://coinbase.com" target="_blank" rel="noopener" class="text-body-secondary"> Bitcoin Price API by Coinbase</a>
+  </footer>
+</div>
+
+  <!-- =====================================================
+       3. MODAL DE EDIÇÃO
+       ===================================================== -->
+ <div class="modal fade" id="modalEditar" tabindex="-1" aria-labelledby="modalEditarTitulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <form id="formEditar" novalidate>
+          <div class="modal-header">
+            <h2 class="modal-title h5" id="modalEditarTitulo" data-i18n="modal.titulo">Editar despesa</h2>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="editId">
+ 
+            <div class="mb-3">
+              <label for="editDescricao" class="form-label" data-i18n="campo.descricao">Descrição</label>
+              <input type="text" class="form-control" id="editDescricao" required>
+              <div class="invalid-feedback" data-i18n="erro.descricao">Indique uma descrição.</div>
+            </div>
+ 
+            <div class="row g-3">
+              <div class="col-6">
+                <label for="editValor" class="form-label" data-i18n="campo.valor">Valor</label>
+                <div class="input-group">
+                  <input type="number" class="form-control" id="editValor" min="0.01" step="0.01" required>
+                  <span class="input-group-text">€</span>
+                  <div class="invalid-feedback" data-i18n="erro.valor">Valor inválido.</div>
+                </div>
+              </div>
+              <div class="col-6">
+                <label for="editCategoria" class="form-label" data-i18n="campo.categoria">Categoria</label>
+                <select class="form-select" id="editCategoria" required>
+                  <option value="Alimentação">Alimentação</option>
+                  <option value="Transportes">Transportes</option>
+                  <option value="Habitação">Habitação</option>
+                  <option value="Lazer">Lazer</option>
+                  <option value="Finanças">Finanças</option>
+                  <option value="Saúde">Saúde</option>
+                  <option value="Educação">Educação</option>
+                  <option value="Outros">Outros</option>
+                </select>
+              </div>
+            </div>
+ 
+            <div class="mt-3">
+              <label for="editData" class="form-label" data-i18n="campo.data">Data</label>
+              <input type="date" class="form-control" id="editData" required>
+              <div class="invalid-feedback" data-i18n="erro.data">Indique uma data.</div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" data-i18n="modal.cancelar">Cancelar</button>
+            <button type="submit" class="btn btn-primary" data-i18n="modal.guardar">Guardar alterações</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- =====================================================
+       4. MODAL DE OPÇÕES (horário e cidade do tempo)
+       Os <option> dos dois selects são criados pelo JS
+       ===================================================== -->
+  <div class="modal fade" id="modalOpcoes" tabindex="-1" aria-labelledby="modalOpcoesTitulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <form id="formOpcoes">
+          <div class="modal-header">
+            <h2 class="modal-title h5" id="modalOpcoesTitulo" data-i18n="opcoes.titulo">Opções</h2>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="opcaoFuso" class="form-label" data-i18n="opcoes.fuso">Horário</label>
+              <select class="form-select" id="opcaoFuso"></select>
+            </div>
+            <div>
+              <label for="opcaoCidade" class="form-label" data-i18n="opcoes.cidade">Cidade para o tempo</label>
+              <select class="form-select" id="opcaoCidade"></select>
+            </div>
+ 
+            <hr>
+            <div>
+              <div class="form-label" data-i18n="opcoes.exemplos">Despesas de exemplo</div>
+              <p class="small text-body-secondary mb-2" data-i18n="opcoes.exemplosInfo">Cria um conjunto de despesas aleatórias ao longo do ano, em todas as categorias.</p>
+              <button type="button" id="btnGerarExemplos" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-magic"></i> <span data-i18n="opcoes.gerar">Gerar despesas</span>
+              </button>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" data-i18n="modal.cancelar">Cancelar</button>
+            <button type="submit" class="btn btn-primary" data-i18n="opcoes.guardar">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================
+       5. MODAL DO BITCOIN 
+       ===================================================== -->
+  <div class="modal fade" id="modalBitcoin" tabindex="-1" aria-labelledby="modalBitcoinTitulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title h5" id="modalBitcoinTitulo">
+            <i class="bi bi-currency-bitcoin text-warning"></i>
+            <span data-i18n="btc.titulo">Pssst! Já ouviste falar de Bitcoin?</span>
+          </h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body text-center py-4">
+          <p class="text-body-secondary mb-1" data-i18n="btc.intro">Com o total das tuas despesas podias ter comprado:</p>
+          <div id="btcResultado" class="fs-2 fw-bold text-warning my-2">—</div>
+          <div id="btcTotal" class="small text-body-secondary"></div>
+          <div id="btcPreco" class="small text-body-secondary"></div>
+          <div id="btcErro" class="alert alert-warning small mt-3 mb-0 d-none" data-i18n="btc.erro">Não foi possível obter o preço do bitcoin.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================
+       6. MODAL DE CONFIRMAÇÃO (apagar uma despesa ou várias)
+       A mensagem é escrita pelo JS (pedirConfirmacao)
+       ===================================================== -->
+  <div class="modal fade" id="modalConfirmar" tabindex="-1" aria-labelledby="modalConfirmarTitulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title h5" id="modalConfirmarTitulo">
+            <i class="bi bi-exclamation-triangle text-danger"></i>
+            <span data-i18n="confirmar.titulo">Confirmar eliminação</span>
+          </h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <p id="confirmarMensagem" class="mb-1"></p>
+          <p id="confirmarDetalhe" class="small text-body-secondary mb-0"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" data-i18n="modal.cancelar">Cancelar</button>
+          <button type="button" id="btnConfirmar" class="btn btn-danger" data-i18n="lista.apagar">Apagar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS (necessário para o modal) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

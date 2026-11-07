@@ -1,0 +1,376 @@
+/* =========================================================
+   Gestor de Despesas Pessoais — estilos
+   O tema é controlado pelo atributo data-bs-theme no <html>
+   (Bootstrap 5.3). Aqui só definimos as nossas variáveis.
+   ========================================================= */
+
+:root,
+[data-bs-theme="light"] {
+  --app-bg: #f2f5f4;
+  --app-surface: #ffffff;
+  --app-border: #dde5e2;
+  --app-accent: #0f766e;
+  --app-accent-hover: #0b5f58;
+  --app-ink: #17302c;
+
+  
+  --bs-primary: var(--app-accent);
+  --bs-primary-rgb: 15, 118, 110;
+  --bs-link-color: var(--app-accent);
+  --bs-body-bg: var(--app-bg);
+  --bs-body-color: var(--app-ink);
+  --bs-border-color: var(--app-border);
+}
+
+[data-bs-theme="dark"] {
+  --app-bg: #0f1a18;
+  --app-surface: #162522;
+  --app-border: #264039;
+  --app-accent: #2dd4bf;
+  --app-accent-hover: #5eead4;
+  --app-ink: #e4f1ee;
+
+  --bs-primary: var(--app-accent);
+  --bs-primary-rgb: 45, 212, 191;
+  --bs-link-color: var(--app-accent);
+  --bs-body-bg: var(--app-bg);
+  --bs-body-color: var(--app-ink);
+  --bs-border-color: var(--app-border);
+}
+
+body {
+  background-color: var(--app-bg);
+  transition: background-color .2s ease, color .2s ease;
+}
+
+h1, h2, h3, h4, h5, h6,
+.brand,
+.total-valor {
+  font-family: "Sora", system-ui, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+/* ---------- Botão principal com a cor do tema ---------- */
+.btn-primary {
+  --bs-btn-bg: var(--app-accent);
+  --bs-btn-border-color: var(--app-accent);
+  --bs-btn-hover-bg: var(--app-accent-hover);
+  --bs-btn-hover-border-color: var(--app-accent-hover);
+  --bs-btn-active-bg: var(--app-accent-hover);
+  --bs-btn-active-border-color: var(--app-accent-hover);
+  --bs-btn-color: #ffffff;
+  --bs-btn-hover-color: #ffffff;
+  --bs-btn-active-color: #ffffff;
+}
+
+[data-bs-theme="dark"] .btn-primary {
+  --bs-btn-color: #06201c;
+  --bs-btn-hover-color: #06201c;
+  --bs-btn-active-color: #06201c;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--app-accent);
+  box-shadow: 0 0 0 .2rem rgba(var(--bs-primary-rgb), .2);
+}
+
+/* ---------- Cartões ---------- */
+.card {
+  background-color: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: .75rem;
+}
+
+/* ---------- Marca ---------- */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  font-weight: 700;
+  color: var(--app-accent);
+  font-size: 1.1rem;
+}
+
+.brand i {
+  font-size: 1.3rem;
+}
+
+/* ---------- Login ---------- */
+.login-wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 26rem;
+}
+
+/* ---------- Barra de topo ---------- */
+.topbar {
+  background-color: var(--app-surface);
+  border-bottom: 1px solid var(--app-border);
+  padding-block: .6rem;
+}
+
+.topbar > .container-xl {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.saudacao {
+  font-weight: 600;
+  padding-left: 1rem;
+  border-left: 1px solid var(--app-border);
+}
+
+/* ---------- Relógio ---------- */
+.relogio-hora {
+  font-family: "Sora", system-ui, sans-serif;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.relogio-data {
+  font-size: .8rem;
+  color: var(--bs-secondary-color);
+}
+
+/* ---------- Total ---------- */
+.total-label {
+  font-size: .9rem;
+  color: var(--bs-secondary-color);
+}
+
+.total-valor {
+  font-size: 2.4rem;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  color: var(--app-accent);
+}
+
+/* ---------- Tempo (API) ---------- */
+.tempo-temp {
+  font-family: "Sora", system-ui, sans-serif;
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* ---------- Tabela ---------- */
+.table {
+  --bs-table-bg: transparent;
+}
+
+.table thead th {
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--bs-secondary-color);
+  border-bottom-color: var(--app-border);
+}
+
+.table td {
+  padding-block: .85rem;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.valor-celula {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ---------- Estado vazio ---------- */
+.vazio {
+  color: var(--bs-secondary-color);
+}
+
+.vazio i {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: .5rem;
+  opacity: .6;
+}
+
+/* ---------- Etiquetas de categoria (usar no JS: class="badge cat-alimentacao") ---------- */
+.badge[class*="cat-"] {
+  font-weight: 600;
+  padding: .4em .7em;
+}
+
+.cat-alimentacao { background-color: #fde8d4; color: #8a4310; }
+.cat-transportes { background-color: #d9e9fb; color: #1b4b82; }
+.cat-habitacao   { background-color: #e5defa; color: #4a3490; }
+.cat-lazer       { background-color: #fbdbe9; color: #86204f; }
+.cat-financas { background-color: #d3f0f5; color: #0c5560; }
+.cat-saude       { background-color: #d5f1e0; color: #14633a; }
+.cat-educacao    { background-color: #fbf0c4; color: #6b5300; }
+.cat-outros      { background-color: #e3e8e7; color: #3b4a47; }
+
+[data-bs-theme="dark"] .cat-alimentacao { background-color: #4a2a12; color: #fbc79a; }
+[data-bs-theme="dark"] .cat-transportes { background-color: #14304f; color: #a9cff7; }
+[data-bs-theme="dark"] .cat-habitacao   { background-color: #2d2150; color: #cabdf5; }
+[data-bs-theme="dark"] .cat-lazer       { background-color: #4d1632; color: #f5aecb; }
+[data-bs-theme="dark"] .cat-financas { background-color: #0f3a42; color: #9fe0ea; }
+[data-bs-theme="dark"] .cat-saude       { background-color: #12402a; color: #9fe0bb; }
+[data-bs-theme="dark"] .cat-educacao    { background-color: #433500; color: #f2dc86; }
+[data-bs-theme="dark"] .cat-outros      { background-color: #2a3835; color: #b9c9c5; }
+
+/* ---------- Pequenos ajustes ---------- */
+.modal-content {
+  background-color: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: .75rem;
+}
+
+@media (max-width: 575.98px) {
+  .total-valor { font-size: 2rem; }
+  .saudacao { padding-left: .5rem; font-size: .95rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body { transition: none; }
+}
+
+
+/* =========================================================
+   LAYOUT DA APP — NAVBAR NO TOPO, FOOTER NO FUNDO
+   Mobile: página adaptável e lista com scroll próprio.
+   Desktop: aplicação ocupa exatamente a altura do ecrã.
+   ========================================================= */
+
+/* ---------- Lista de despesas: todos os ecrãs ---------- */
+
+.app-lista-scroll {
+    max-height: 60vh;
+    overflow-y: auto;
+    overflow-x: auto;
+    min-height: 0;
+}
+
+/* Cabeçalho fixo durante o scroll */
+.app-lista-scroll thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background-color: var(--app-surface);
+    box-shadow: inset 0 -1px 0 var(--app-border);
+}
+
+/* ---------- Footer ---------- */
+
+#secaoApp {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+}
+
+#secaoApp footer {
+    flex-shrink: 0;
+    margin-top: auto;
+}
+
+/* ---------- Desktop: 992px ou superior ---------- */
+
+@media (min-width: 992px) {
+
+    /* A aplicação ocupa exatamente o ecrã */
+    #secaoApp {
+        height: 100vh;
+        height: 100dvh;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    /* Navbar não encolhe */
+    .topbar {
+        flex-shrink: 0;
+    }
+
+    /* Área central entre navbar e footer */
+    .app-main {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    /* Linha das duas colunas */
+    .app-row {
+        flex: 1 1 auto;
+        min-height: 0;
+    }
+
+    /* Coluna esquerda */
+    .app-col-esq {
+        min-height: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    /* Coluna direita */
+    .app-col-dir {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    /* Cartão do total não encolhe */
+    .app-col-dir > .card:first-child {
+        flex-shrink: 0;
+    }
+
+    /* Cartão da lista ocupa o espaço restante */
+    .app-lista {
+        display: flex;
+        flex: 1 1 0;
+        flex-direction: column;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    /* Corpo do cartão */
+    .app-lista > .card-body {
+        display: flex;
+        flex: 1 1 auto;
+        flex-direction: column;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    /* Tabela ocupa o espaço restante e faz scroll */
+    .app-lista-scroll {
+        flex: 1 1 auto;
+        min-height: 0;
+        max-height: none;
+        overflow-y: auto;
+        overflow-x: auto;
+    }
+
+    /* Footer sempre no fundo */
+    #secaoApp footer {
+        flex-shrink: 0;
+        margin-top: 0;
+    }
+}
+
+/* ---------- Pequenos ajustes ---------- */
+
+@media (max-width: 991.98px) {
+    #secaoApp footer {
+        margin-top: auto;
+    }
+}
